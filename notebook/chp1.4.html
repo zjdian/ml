@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>为什么机器能学习</title>
+    <meta charset="utf-8">
+    <style>
+            body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+h1, h2, h3 {
+  font-weight: 400;
+  margin-bottom: 0;
+}
+.remark-slide-content h1 { font-size: 3em; }
+.remark-slide-content h2 { font-size: 2em; }
+.remark-slide-content h3 { font-size: 1.6em; }
+.footnote {
+  position: absolute;
+  bottom: 3em;
+}
+li p { line-height: 1.25em; }
+.red { color: #fa0000; }
+.large { font-size: 2em; }
+a, a > code {
+  color: rgb(249, 38, 114);
+  text-decoration: none;
+}
+code {
+  background: none repeat scroll 0 0 #F8F8FF;
+  border: 1px solid #DEDEDE;
+  border-radius: 3px  ;
+  padding: 0 0.2em;
+}
+.remark-code, .remark-inline-code { font-family: "Bitstream Vera Sans Mono", "Courier", monospace; }
+.remark-code-line-highlighted     { background-color: #373832; }
+.pull-left {
+  float: left;
+  width: 47%;
+}
+.pull-right {
+  float: right;
+  width: 47%;
+}
+.pull-right ~ p {
+  clear: both;
+}
+#slideshow .slide .content code {
+  font-size: 0.8em;
+}
+#slideshow .slide .content pre code {
+  font-size: 0.9em;
+  padding: 15px;
+}
+.main-title, .title {
+  background: #272822;
+  color: #777872;
+  text-shadow: 0 0 20px #333;
+}
+.title h1, .title h2, .main-title h1, .main-title h2 {
+  color: #f3f3f3;
+  line-height: 0.8em;
+}
+/* Custom */
+.remark-code {
+  display: block;
+  padding: 0.5em;
+}
+
+
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif);
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body {
+        font-family: 'Droid Serif';
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 400;
+        margin-bottom: 0;
+      }
+      .remark-slide-content h1 { font-size: 3em; }
+      .remark-slide-content h2 { font-size: 2em; }
+      .remark-slide-content h3 { font-size: 1.6em; }
+      .footnote {
+        position: absolute;
+        bottom: 3em;
+      }
+      li p { line-height: 1.25em; }
+      .red { color: #fa0000; }
+      .large { font-size: 2em; }
+      a, a > code {
+        color: rgb(249, 38, 114);
+        text-decoration: none;
+      }
+      code {
+        background: #e7e8e2;
+        border-radius: 5px;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      .remark-code-line-highlighted     { background-color: #373832; }
+      .pull-left {
+        float: left;
+        width: 47%;
+      }
+      .pull-right {
+        float: right;
+        width: 47%;
+      }
+      .pull-right ~ p {
+        clear: both;
+      }
+      #slideshow .slide .content code {
+        font-size: 0.8em;
+      }
+      #slideshow .slide .content pre code {
+        font-size: 0.9em;
+        padding: 15px;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+
+      /* Slide-specific styling */
+      #slide-inverse .footnote {
+        bottom: 12px;
+        left: 20px;
+      }
+      #slide-how .slides {
+        font-size: 0.9em;
+        position: absolute;
+        top:  151px;
+        right: 140px;
+      }
+      #slide-how .slides h3 {
+        margin-top: 0.2em;
+      }
+      #slide-how .slides .first, #slide-how .slides .second {
+        padding: 1px 20px;
+        height: 90px;
+        width: 120px;
+        -moz-box-shadow: 0 0 10px #777;
+        -webkit-box-shadow: 0 0 10px #777;
+        box-shadow: 0 0 10px #777;
+      }
+      #slide-how .slides .first {
+        background: #fff;
+        position: absolute;
+        top: 20%;
+        left: 20%;
+        z-index: 1;
+      }
+      #slide-how .slides .second {
+        position: relative;
+        background: #fff;
+        z-index: 0;
+      }
+
+      /* Two-column layout */
+      .left-column {
+        color: #777;
+        width: 20%;
+        height: 92%;
+        float: left;
+      }
+        .left-column h2:last-of-type, .left-column h3:last-child {
+          color: #000;
+        }
+      .right-column {
+        width: 75%;
+        float: right;
+        padding-top: 1em;
+      }
+
+    </style>
+  </head>
+  <body>
+  <textarea id="source">
+
+class: center, middle,inverse
+
+# 为什么机器能学习
+
+.footnote[参考[台大机器学习](http://pan.baidu.com/s/1o8Cu8iA 密码: sm3i)]
+
+---
+## 学习模型
+.center[![](../img/learnmodel.jpg)]
+
+
+* **D**ata Set, D: {(**X**<sub>1</sub>,Y<sub>1</sub>), (**X**<sub>2</sub>,Y<sub>2</sub>), ... (**X**<sub>N</sub>,Y<sub>N</sub>)}
+* **X** 输入特征向量， Y 为输出
+* **f** 理想的目标函数可以完全反映所有的关系(实际未知), f: **X** → Y
+* **H**ypothesis Set, 推论输入**X** 与输出 Y 之间存在的关系称为假设，而一系列的假设构成一个集合
+* **A**lgorithm, 学习算法，为挑选假设的说法
+* **g** 通过算法从假设集挑选最接近f的假设
+* **A** 从**D** 和 **H** 里面得到一个**g** ≈ **f**, 机器学习是通过数据从假设中挑选最接近目标函数的g，用它来推测训练数据意外的其它数据对应结果
+* Learning Model = **A** 和 **H**
+
+---
+## 学习的问题
++ learning: 就是从hypothesis set里面挑一个“长”的最像`\(f\)`的方程`\(g\)`
++ 接近`\(f\)`不是说`\(g\)`和`\(f\)`结构很类似，(因为`\(f\)`永远是未知的)，而是说他们的判断很一致，即`\(g(x)\approx f(x)\)`
++ 近是针对训练集`\(\mathcal{D}\)`而言的，`\(\mathcal{D}\)`之外的数据他们能否表现一致，这才是我们最应该关心的问题
++ 如果`\(\mathcal{D}\)`之外他们也能够表现一致，说明我们learning的还不错，我们有从`\(\mathcal{D}\)`上面学到东西。
++ 问题：能否有理论保证`\(g(x)\approx f(x)\)`在`\(\mathcal{D}\)`之外也能有差不多的接近程度？
+
+---
+
+## 推断未知的世界
+
++ 无法推断`\(\mathcal{D}\)`之外事情，因此learning不可行
++ 其他场景中，我们能否利用`\(\mathcal{D}\)`来推断`\(\mathcal{D}\)`以外的事情呢？
++ 在统计推断中，我们可以利用样本的统计量(statistic)来推断总体的参数(parameter)
++ 使用样本均值来估计总体期望,并且样本量越大，统计量与参数之间的误差会越小
+
+我们似乎可以通过`\(\mathcal{D}\)`来推断`\(\mathcal{D}\)`之外的东西?
+
+.center[![](../img/bin_sample.png)]
+
+---
+## Hoeffding's Inequality
+
+假设以`\(\nu\)`来代表样本的均值，这个`\(\nu\)`能不能在一定程度上代表了`\(\mu\)`。也许某次样本全部是一种颜色？但这种事情发生的可能性大吗？不大，并且如果我们有更多的样本(抽出更多的球)，则这种事情发生的可能性会越来越小。在概率论中，可以用[Hoeffding's Inequality](http://en.wikipedia.org/wiki/Hoeffding's_inequality)来描述上面那件事情的概率：
+
+$$
+\mathbb{P}[|\nu-\mu|>\epsilon]\leq 2exp(-2\epsilon ^2N)
+$$
+
+注：`\(\epsilon\)`是我们的容忍度，当`\(\mu\)`与`\(\nu\)`的差别小于容忍度时，我们称`\(\mu\)`与`\(\nu\)`“差不多”(PAC, probably approximately correct)，当`\(\mu\)`与`\(\nu\)`差别大于容忍度时，我们称`\(\mu\)`与`\(\nu\)`"差很多"。“差很多”这件事发生的概率越小越好，最大不会超过右边。
+
+上面这个不等式中，控制右边数值大小的只有`\(\epsilon ^2\)`和`\(N\)`，`\(\epsilon ^2\)`减小(要求降低)与`\(N\)`(样本增加)增大都能够使坏事情发生的概率的上限减少。当上限足够小的时候，我们可以说，sample中orange的比例和bin中orange的概率**差不多**，如果sample中的orange比例少，则bin中的orange的比例也会比较少
+
+---
+## 对应的学习问题
+.center[![](../img/marble_learning.png)]
+
+针对前面问题`\(f\)`,他代表未知的真理，而`\(h(x)\)`是属于hypothesis set `\(\mathcal{H}\)`的某一个方程。对于某一个向量`\(x_n\)`：
+
+ - 如果`\(h(x_n)\neq f(x_n)\)`，即他们判断不一致，我们记第n个小球是orange
+ - 如果`\(h(x_n)=f(x_n)\)`, 即他们判断是一致的，我们记第n个小球是green
+
+利用Hoeffding's Inequality，我们可以写成：
+$$
+\mathbb{P}[|E_i(h)-E_o(h)|\gt \epsilon]\leq 2 exp(-2\epsilon ^2N)
+$$
+
+简单说来，当右边这个“上界”足够小时，我们可以说`\(h\)`在sample中的表现(错误率)与`\(h\)`在总体的表现是差不多的。
+
+---
+## 新问题
+对于一个固定的`\(h\)` 而言，`\(E_i(h)\)`会与`\(E_o(h)\)`很接近，这种情况能说是一种好的learning吗？当然不能，因为如果`\(E_i(h)\)`很大，则`\(E_o\)`也大，这样是没有意义的。因此我们的算法`\(\mathcal{A}\)`要能够自由的从`\(\mathcal{H}\)`中挑选方程，我们把`\(\mathcal{A}\)`挑选出的最好的`\(h\)`称为`\(g\)` (final hypothesis)。因此这里就需要添加一个验证流程(Verification Flow)，这个流程使用历史数据来判断某个`\(h\)`够不够好。
+
+.center[![](../img/verification_flow.png)]
+
+---
+
+## 不幸的状况 (Bad Data)
+
++ `\(\mathcal{A}\)`要能够自由的在`\(\mathcal{H}\)`中挑选它认为最适合的方程，因此这个最适合的方程就有可能是`\(\mathcal{H}\)`中的任何一个，有可能是`\(h_1\)`，有可能是`\(h_2\)`...
++ `\(\mathcal{D}\)`只是来自于总体的一个样本 (sample)，既然是sample，就一定会存在抽样误差。譬如你想知道一枚硬币抛出正面的概率是多少，于是你扔了5次，有一定的可能你连续扔了5个正面出来，这时候说抛出正面的概率是1，这样对吗？这当然是行不通的，因此你扔的这5次硬币，就是一个**bad sample**。凡是由于抽样误差所造成样本分布与总体分布相差很大的样本，我们都可以称之为**bad sample**。
++ learning同样会遇到bad sample的麻烦。比如实际上`\(h_1\)`是个很好的方程，本来能够成为`\(g\)`的，但是由于抽样误差，碰到了bad sample，造成`\(E_i(h_1)\)`很大，`\(\mathcal{A}\)`最终没有选择它。又比如`\(h_2\)`是个不好的方程，碰到了bad sample，碰巧`\(E_i(h_2)\)`又很小，导致`\(\mathcal{A}\)`错误得选择了它.作为`\(g\)`。因此每个`\(h\)`都有可能遇上bad sample的烦恼。
+
+&emsp;&emsp;因此只要`\(\mathcal{H}\)`中任意个`\(h\)`遇上bad sample，我们的`\(\mathcal{A}\)`在挑选方程时就会遇到麻烦，我们的learning就有可能不太好。那么bad sample发生的概率有多大呢？
+
+
+
+---
+class:middle
+## 出现问题的概率？
+
+`\()
+\begin{aligned}
+\ & \mathbb{P}_{\mathcal{D}}[BAD\ \mathcal{D}] \\\
+\ & = \mathbb{P}_{\mathcal{D}}[BAD\ \mathcal{D}\ for\ h_1\ or\ BAD\ \mathcal{D}\ for\ h_2\ or\ ...\ or\ BAD\ \mathcal{D}\ for\ h_M] \\\
+\ & \leq \mathbb{P}_{\mathcal{D}}[BAD\ \mathcal{D}\ for\ h_1] + \mathbb{P}_{\mathcal{D}}[BAD\ \mathcal{D}\ for\ h_2]+...+\mathbb{P}_{\mathcal{D}}[BAD\ \mathcal{D}\ for\ h_M] \\\
+\ & \leq 2exp(-2\epsilon ^2N) + \leq 2exp(-2\epsilon ^2N) + ... + \leq 2exp(-2\epsilon ^2N) \\\
+\ & = 2Mexp(-2\epsilon ^2N)
+\end{aligned}
+\)`
+
+learning得好不好，还与`\(\mathcal{H}\)`里面的方程数量`\(M\)`有关。当`\(M\)`是有限的时候，数据量越大，发生bad sample的可能性越低。同理如果`\(M\)`太大，我们也越容易遇到bad sample。
+
+---
+## 成长函数 (Growth Function)
+
+`\(\mathcal{H}\)`作用于`\(\mathcal{D}\)`“**最多**”能产生多少种不同的结果（dichotomy)呢？这个数量与`\(\mathcal{H}\)`有关，也与数据量`\(N\)`有关。用数学式可以表达为-成长函数（growth function）：
+
+$$
+max|\mathcal{H}(x_1,x_2,...,x_N)|
+$$
+
+方程的数量看上去是无穷的，但真正有效(effective)的方程的数量却是有限的，我们可以用成长函数`\(m_{\mathcal{H}}(N)\)`来描述`\(\mathcal{H}\)`作用于`\(\mathcal{D}\)`会产生多少种有效的方程。如果用有限的成长函数去代替无限的`\(M\)`，就有：
+
+$$
+\mathbb{P}_\mathcal{D}[BAD\ D] \leq 2m_H(N)\cdot exp(-2\epsilon ^2N)
+$$
+
+进一步利用Vapnik-Chervonenkis (VC) bound:
+
+$$
+\mathbb{P}[BAD] \leq 4m_{\mathcal{H}}(2N)exp(-\frac{1}{8}\epsilon^2N)
+$$
+
+---
+### VC Bound
+$$
+E_i(g)-\sqrt{\frac{8}{N}ln(\frac{4(2N)^{d_v}}{\delta})} \leq E_o(g) \leq E_i(g)+\sqrt{\frac{8}{N}ln(\frac{4(2N)^{d_v}}{\delta})}
+$$
+
+&emsp;&emsp;令`\(\Omega (N,\mathcal{H},\delta)=\sqrt{...}\)`，即上式的根号项为来自模型复杂度的，模型越复杂，`\(E_i\)`与`\(E_o\)`离得越远。
+
+.center[![](../img/model_complexity_curve.png)]
+
+&emsp;&emsp;随着`\(d_v\)`的上升，`\(E_i\)`不断降低，而`\(\Omega\)`项不断上升，他们的上升与下降的速度在每个阶段都是不同的，因此我们能够寻找一个二者兼顾的，比较合适的`\(d_v^{*}\)`，用来决定应该使用多复杂的模型。
+
+
+
+
+    </textarea>
+   <script src="http://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript"></script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML&delayStartupUntil=configured" type="text/javascript"></script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+
+      // Setup MathJax
+      MathJax.Hub.Config({
+          tex2jax: {
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+          }
+      });
+      MathJax.Hub.Queue(function() {
+          $(MathJax.Hub.getAllJax()).map(function(index, elem) {
+              return(elem.SourceElement());
+          }).parent().addClass('has-jax');
+      });
+
+      MathJax.Hub.Configured();
+    </script>
+  </body>
+</html>
