@@ -15,6 +15,25 @@ cm3 = ListedColormap(['#0000aa', '#ff2020', '#50ff50'])
 cm2 = ListedColormap(['#0000aa', '#ff2020'])
 
 
+
+cm_cycle = ListedColormap(['#0000aa', '#ff2020', '#50ff50', 'c', '#fff000'])
+
+
+# create a smooth transition from the first to to the second color of cm3
+# similar to RdBu but with our red and blue, also not going through white,
+# which is really bad for greyscale
+
+cdict = {'red': [(0.0, 0.0, cm2(0)[0]),
+                 (1.0, cm2(1)[0], 1.0)],
+
+         'green': [(0.0, 0.0, cm2(0)[1]),
+                   (1.0, cm2(1)[1], 1.0)],
+
+         'blue': [(0.0, 0.0, cm2(0)[2]),
+                  (1.0, cm2(1)[2], 1.0)]}
+
+ReBl = LinearSegmentedColormap("ReBl", cdict)
+
 def discrete_scatter(x1, x2, y=None, markers=None, s=10, ax=None,
                      labels=None, padding=.2, alpha=1, c=None, markeredgewidth=None):
     """Adaption of matplotlib.pyplot.scatter to plot classes or clusters.
@@ -127,7 +146,7 @@ def plot_2d_separator(classifier, X, fill=False, ax=None, eps=None, alpha=1,
         fill_levels = [0] + levels + [1]
     if fill:
         ax.contourf(X1, X2, decision_values.reshape(X1.shape),
-                    levels=fill_levels, alpha=alpha, cmap=cm)
+                    levels=fill_levels, alpha=alpha, cmap=cm2)
     else:
         ax.contour(X1, X2, decision_values.reshape(X1.shape), levels=levels,
                    colors="black", alpha=alpha, linewidths=linewidth,
@@ -195,3 +214,91 @@ def plot_tree_partition(X, y, tree, ax=None):
     ax.set_xticks(())
     ax.set_yticks(())
     return ax
+
+def plot_2d_scores(classifier, X, ax=None, eps=None, alpha=1, cm="viridis", function=None):
+    # binary with fill
+    if eps is None:
+        eps = X.std() / 2.
+
+    if ax is None:
+        ax = plt.gca()
+
+    x_min, x_max = X[:, 0].min() - eps, X[:, 0].max() + eps
+    y_min, y_max = X[:, 1].min() - eps, X[:, 1].max() + eps
+    xx = np.linspace(x_min, x_max, 100)
+    yy = np.linspace(y_min, y_max, 100)
+
+    X1, X2 = np.meshgrid(xx, yy)
+    X_grid = np.c_[X1.ravel(), X2.ravel()]
+    if function is None:
+        function = getattr(classifier, "decision_function", getattr(classifier, "predict_proba"))
+    else:
+        function = getattr(classifier, function)
+    decision_values = function(X_grid)
+    if decision_values.ndim > 1 and decision_values.shape[1] > 1:
+        # predict_proba
+        decision_values = decision_values[:, 1]
+    grr = ax.imshow(decision_values.reshape(X1.shape),
+                    extent=(x_min, x_max, y_min, y_max), aspect='auto',
+                    origin='lower', alpha=alpha, cmap=cm2)
+
+    ax.set_xlim(x_min, x_max)
+    ax.set_ylim(y_min, y_max)
+    ax.set_xticks(())
+    ax.set_yticks(())
+    return grr
+
+
+def plot_decision_threshold():
+    from .make_blobs import make_blobs
+    from sklearn.svm import SVC
+    from sklearn.model_selection import train_test_split
+
+    X, y = make_blobs(n_samples=(400, 50), centers=2, cluster_std=[7.0, 2],
+                      random_state=22)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+
+    fig, axes = plt.subplots(2, 3, figsize=(15, 8), subplot_kw={'xticks': (), 'yticks': ()})
+    plt.suptitle("decision_threshold")
+    axes[0, 0].set_title("training data")
+    discrete_scatter(X_train[:, 0], X_train[:, 1], y_train, ax=axes[0, 0])
+
+    svc = SVC(gamma=.05).fit(X_train, y_train)
+    axes[0, 1].set_title("decision with threshold 0")
+    discrete_scatter(X_train[:, 0], X_train[:, 1], y_train, ax=axes[0, 1])
+    plot_2d_scores(svc, X_train, function="decision_function", alpha=.7,
+                   ax=axes[0, 1], cm=ReBl)
+    plot_2d_separator(svc, X_train, linewidth=3, ax=axes[0, 1])
+    axes[0, 2].set_title("decision with threshold -0.8")
+    discrete_scatter(X_train[:, 0], X_train[:, 1], y_train, ax=axes[0, 2])
+    plot_2d_separator(svc, X_train, linewidth=3, ax=axes[0, 2], threshold=-.8)
+    plot_2d_scores(svc, X_train, function="decision_function", alpha=.7,
+                   ax=axes[0, 2], cm=ReBl)
+
+    axes[1, 0].set_axis_off()
+
+    mask = np.abs(X_train[:, 1] - 7) < 5
+    bla = np.sum(mask)
+
+    line = np.linspace(X_train.min(), X_train.max(), 100)
+    axes[1, 1].set_title("Cross-section with threshold 0")
+    axes[1, 1].plot(line, svc.decision_function(np.c_[line, 10 * np.ones(100)]), c='k')
+    dec = svc.decision_function(np.c_[line, 10 * np.ones(100)])
+    contour = (dec > 0).reshape(1, -1).repeat(10, axis=0)
+    axes[1, 1].contourf(line, np.linspace(-1.5, 1.5, 10), contour, alpha=0.4, cmap=cm2)
+    discrete_scatter(X_train[mask, 0], np.zeros(bla), y_train[mask], ax=axes[1, 1])
+    axes[1, 1].set_xlim(X_train.min(), X_train.max())
+    axes[1, 1].set_ylim(-1.5, 1.5)
+    axes[1, 1].set_xticks(())
+    axes[1, 1].set_ylabel("Decision value")
+
+    contour2 = (dec > -.8).reshape(1, -1).repeat(10, axis=0)
+    axes[1, 2].set_title("Cross-section with threshold -0.8")
+    axes[1, 2].contourf(line, np.linspace(-1.5, 1.5, 10), contour2, alpha=0.4, cmap=cm2)
+    discrete_scatter(X_train[mask, 0], np.zeros(bla), y_train[mask], alpha=.1, ax=axes[1, 2])
+    axes[1, 2].plot(line, svc.decision_function(np.c_[line, 10 * np.ones(100)]), c='k')
+    axes[1, 2].set_xlim(X_train.min(), X_train.max())
+    axes[1, 2].set_ylim(-1.5, 1.5)
+    axes[1, 2].set_xticks(())
+    axes[1, 2].set_ylabel("Decision value")
+    axes[1, 0].legend(['negative class', 'positive class'])
